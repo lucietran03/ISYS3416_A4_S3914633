@@ -6,92 +6,129 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The {@code App} class handles user account registration and input validation.
+ * It ensures that user inputs such as full name, date of birth, email, username,
+ * and password meet predefined constraints. Valid inputs result in the creation
+ * of an {@code Account} object.
+ *
+ * This class includes methods for validation and provides error messages for invalid inputs.
+ *
+ * @author Tran Dong Nghi - S3914633
+ * @version 1.0
+ */
 public class App {
 
-    // Main registration function that validates the inputs and displays multiple errors
+    /**
+     * Registers a new account by validating the provided inputs.
+     * If any input fails validation, corresponding error messages are displayed.
+     *
+     * @param fullName The full name of the user.
+     * @param dob      The date of birth of the user in yyyy-MM-dd format.
+     * @param email    The email address of the user.
+     * @param username The desired username for the account.
+     * @param password The desired password for the account.
+     * @return An Account object if registration is successful, null otherwise.
+     */
     public Account registerAccount(String fullName, String dob, String email, String username, String password) {
         // List to accumulate error messages
         List<String> errorMessages = new ArrayList<>();
 
-        // Validate full name - it should not be null or empty
+        // Validate full name
         String fullNameError = isValidFullName(fullName);
         if (fullNameError != null) {
             errorMessages.add(fullNameError);
         }
 
-        // Validate date of birth (basic format check yyyy-mm-dd)
+        // Validate date of birth
         String dobError = isValidDateOfBirth(dob);
         if (dobError != null) {
             errorMessages.add(dobError);
         }
 
-        // Validate email format using regex
+        // Validate email format
         String emailError = isValidEmail(email);
         if (emailError != null) {
             errorMessages.add(emailError);
         }
 
-        // Validate username using the separate method
+        // Validate username
         String usernameError = isValidUsername(username);
         if (usernameError != null) {
             errorMessages.add(usernameError);
         }
 
-        // Validate password - it must be at least 8 characters long, contain both letters (uppercase and lowercase), and at least one special character
+        // Validate password
         String passwordError = isValidPassword(password);
         if (passwordError != null) {
             errorMessages.add(passwordError);
         }
 
-        // If there are any error messages, print them and return false
+        // Display all error messages if any validation fails
         if (!errorMessages.isEmpty()) {
-            // Print all error messages
             for (String errorMessage : errorMessages) {
                 System.out.println(errorMessage);
             }
-            return null;
+            return null; // Registration failed
         }
 
+        // Create and return a new Account object if all validations pass
         Account account = new Account(fullName, Date.valueOf(dob), email, username, password);
-
-        // If all validations pass, registration is successful
         System.out.println("Registration successful!");
         return account;
     }
 
-    // Helper method to validate full name (checks if it's not null or empty)
+    /**
+     * Validates the full name to ensure it is not null or empty.
+     *
+     * @param fullName The full name to validate.
+     * @return An error message if validation fails, null otherwise.
+     */
     private String isValidFullName(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) {
             return "Full name is required.";
         }
-        return null; // No error
+        return null;
     }
 
-    // Helper method to validate email format using regex
+    /**
+     * Validates the email format using a regular expression.
+     *
+     * @param email The email to validate.
+     * @return An error message if validation fails, null otherwise.
+     */
     private String isValidEmail(String email) {
-        // Regular expression to allow emails with specific domain extensions .com, .com.vn, .edu.vn
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(.*\\.)?(com|com\\.vn|edu\\.vn)$";
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(email);
         if (!matcher.matches()) {
             return "Invalid email format.";
         }
-        return null; // No error
+        return null;
     }
 
-    // Helper method to validate date of birth (basic check for yyyy-mm-dd format)
+    /**
+     * Validates the date of birth to ensure it is in yyyy-MM-dd format.
+     *
+     * @param dob The date of birth to validate.
+     * @return An error message if validation fails, null otherwise.
+     */
     private String isValidDateOfBirth(String dob) {
-        // Regular expression to check if the date is in yyyy-mm-dd format
         String dateRegex = "^\\d{4}-\\d{2}-\\d{2}$";
         Pattern pattern = Pattern.compile(dateRegex);
         Matcher matcher = pattern.matcher(dob);
         if (!matcher.matches()) {
-            return "Invalid date of birth format. Use yyyy-mm-dd.";
+            return "Invalid date of birth format. Use yyyy-MM-dd.";
         }
-        return null; // No error
+        return null;
     }
 
-    // Helper method to validate username
+    /**
+     * Validates the username to ensure it meets length and format requirements.
+     *
+     * @param username The username to validate.
+     * @return An error message if validation fails, null otherwise.
+     */
     private String isValidUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
             return "Username is required.";
@@ -102,48 +139,52 @@ public class App {
         if (username.length() < 6 || username.length() > 20) {
             return "Error: Username must be between 6 and 20 characters long.";
         }
-        return null; // No error
+        return null;
     }
 
-    // Helper method to validate password (minimum 8 characters, contains uppercase, lowercase, and special character)
+    /**
+     * Validates the password to ensure it meets complexity requirements.
+     *
+     * @param password The password to validate.
+     * @return An error message if validation fails, null otherwise.
+     */
     private String isValidPassword(String password) {
-        // Check if password is empty
         if (password == null || password.trim().isEmpty()) {
             return "Password is required.";
         }
-
-        // Check if password length is at least 8 characters
         if (password.length() < 8) {
             return "Password must be at least 8 characters long.";
         }
 
-        // Flags to check for required characters
         boolean hasUpperCase = false;
         boolean hasLowerCase = false;
         boolean hasSpecialChar = false;
 
-        // Iterate through each character in the password to check conditions
         for (char c : password.toCharArray()) {
             if (Character.isUpperCase(c)) {
-                hasUpperCase = true; // Found an uppercase letter
+                hasUpperCase = true;
             } else if (Character.isLowerCase(c)) {
-                hasLowerCase = true; // Found a lowercase letter
+                hasLowerCase = true;
             } else if (!Character.isLetterOrDigit(c)) {
-                hasSpecialChar = true; // Found a special character
+                hasSpecialChar = true;
             }
         }
 
-        // Check if all conditions are met
         if (!(hasUpperCase && hasLowerCase && hasSpecialChar)) {
             return "Password must contain both uppercase and lowercase letters, and at least one special character.";
         }
-        return null; // No error
+        return null;
     }
 
-    // Main method to test the registration functionality
+    /**
+     * Main method to test the registration functionality with sample user data.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
-        // Test data
         App app = new App();
+
+        // Test data array containing sample user inputs
         Object[][] users = {
                 {"Van Nguyen", "2000-08-20", "van.nhk@example.com", "van_nguyenhk", "Van200008!"},
                 {"Nghi Tran", "2005-08-03", "lucie.tran@yahoo.com", "lucietran03", "Rmit@030825"},
@@ -157,6 +198,7 @@ public class App {
                 {"Khoi Nguyen", "2003-06-26", "khoi.nguyen@rmit.edu.vn", "", "", ""}
         };
 
+        // Process each test user
         for (Object[] user : users) {
             String fullName = (String) user[0];
             String dob = (String) user[1];
@@ -165,7 +207,6 @@ public class App {
             String password = (String) user[4];
 
             System.out.println("Test for " + fullName);
-            // Get the list of error messages for each user registration
             Account account = app.registerAccount(fullName, dob, email, username, password);
             System.out.println();
         }
